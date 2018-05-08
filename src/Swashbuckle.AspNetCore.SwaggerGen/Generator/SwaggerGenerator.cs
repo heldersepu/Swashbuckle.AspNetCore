@@ -86,11 +86,16 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
             {
                 var httpMethod = group.Key;
 
-                if (httpMethod == null)
-                    throw new NotSupportedException(string.Format(
-                        "Ambiguous HTTP method for action - {0}. " +
-                        "Actions require an explicit HttpMethod binding for Swagger 2.0",
-                        group.First().ActionDescriptor.DisplayName));
+                if (httpMethod == null )
+                {
+                    if (_settings.ConflictingActionsResolver == null)
+                        throw new NotSupportedException(string.Format(
+                            "Ambiguous HTTP method for action - {0}. " +
+                            "Actions require an explicit HttpMethod binding for Swagger 2.0",
+                            group.First().ActionDescriptor.DisplayName));
+                    else
+                        httpMethod = "GET";
+                }
 
                 if (group.Count() > 1 && _settings.ConflictingActionsResolver == null)
                     throw new NotSupportedException(string.Format(
@@ -100,7 +105,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
                         group.First().RelativePathSansQueryString(),
                         string.Join(",", group.Select(apiDesc => apiDesc.ActionDescriptor.DisplayName))));
 
-                var apiDescription = (group.Count() > 1) ? _settings.ConflictingActionsResolver(group) : group.Single();
+                var apiDescription = (group.Count() > 1 || httpMethod == null) ? _settings.ConflictingActionsResolver(group) : group.Single();
 
                 switch (httpMethod)
                 {

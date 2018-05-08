@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using Basic.Swagger;
+using System.Linq;
 
 namespace Basic
 {
@@ -43,6 +44,7 @@ namespace Basic
                         Description = "A sample API for testing Swashbuckle",
                         TermsOfService = "Some terms ..."
                     }
+
                 );
 
                 c.OperationFilter<AssignOperationVendorExtensions>();
@@ -51,6 +53,7 @@ namespace Basic
                 c.DescribeAllEnumsAsStrings();
 
                 c.SchemaFilter<ExamplesSchemaFilter>();
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
                 //c.DescribeAllParametersInCamelCase();
             });
